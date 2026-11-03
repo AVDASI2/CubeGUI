@@ -1,0 +1,96 @@
+{
+  "_help": "Fuselage and empennage, for the wind-tunnel tests: everything (level 3), and the Cube script's values (CG_...) in the log. Servo outputs are as in cubegui.json: check they match your build. See config/README.md and docs/recipes.md.",
+  "level": 3,
+  "connection": {
+    "localPort": 14550,
+    "cubeAddress": "192.168.4.1",
+    "cubePort": 14555
+  },
+  "logging": {
+    "enabled": true,
+    "folder": "logs",
+    "extraSignals": [
+      "CG_MODE",
+      "CG_SAS",
+      "CG_TGT",
+      "CG_ELEV"
+    ]
+  },
+  "rates": {
+    "telemetryHz": 20,
+    "plotSeconds": 30
+  },
+  "servos": [
+    {
+      "name": "Elevator",
+      "output": 5
+    },
+    {
+      "name": "Rudder",
+      "output": 6
+    },
+    {
+      "name": "Gear",
+      "output": 7
+    }
+  ],
+  "plots": [
+    {
+      "panel": "plotPanel",
+      "signal": "pitch",
+      "height": "2x",
+      "compare": "CG_TGT"
+    },
+    {
+      "panel": "plotPanel",
+      "signal": "Elevator"
+    },
+    {
+      "panel": "plotPanel",
+      "signal": "Rudder"
+    },
+    {
+      "panel": "plotPanel",
+      "signal": "Gear"
+    }
+  ],
+  "controls": [
+    {
+      "panel": "modePanel",
+      "level": 2
+    },
+    {
+      "panel": "servoPanel",
+      "servo": "Elevator"
+    },
+    {
+      "panel": "servoPanel",
+      "servo": "Rudder"
+    },
+    {
+      "panel": "servoPanel",
+      "servo": "Gear"
+    },
+    {
+      "panel": "zeroAllButton"
+    },
+    {
+      "panel": "valuePanel",
+      "signal": "pitch rate",
+      "level": 1
+    },
+    {
+      "panel": "markerPanel",
+      "level": 1
+    },
+    {
+      "panel": "rcPanel",
+      "level": 2
+    },
+    {
+      "panel": "calibrationPanel",
+      "servo": "Elevator",
+      "level": 1
+    }
+  ]
+}

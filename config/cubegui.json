@@ -1,0 +1,90 @@
+{
+  "_help": "CubeGUI settings. Output 5 is MAIN OUT 5 (SERVO5); AUX OUT 1 is output 9. Each servo's PWM limits are the Cube's own SERVOn_MIN, _TRIM and _MAX: change them in CubeGUI's Setup tab. \"plots\" and \"controls\" list the panels on the Run tab, from the panels folder. See config/README.md and docs/recipes.md.",
+  "level": 1,
+  "connection": {
+    "localPort": 14550,
+    "cubeAddress": "192.168.4.1",
+    "cubePort": 14555
+  },
+  "logging": {
+    "enabled": true,
+    "folder": "logs"
+  },
+  "rates": {
+    "telemetryHz": 20,
+    "plotSeconds": 30
+  },
+  "servos": [
+    {
+      "name": "Elevator",
+      "output": 5
+    },
+    {
+      "name": "Rudder",
+      "output": 6
+    },
+    {
+      "name": "Gear",
+      "output": 7
+    }
+  ],
+  "plots": [
+    {
+      "panel": "plotPanel",
+      "signal": "pitch",
+      "height": "2x",
+      "compare": "CG_TGT"
+    },
+    {
+      "panel": "plotPanel",
+      "signal": "Elevator"
+    },
+    {
+      "panel": "plotPanel",
+      "signal": "Rudder"
+    },
+    {
+      "panel": "plotPanel",
+      "signal": "Gear"
+    }
+  ],
+  "controls": [
+    {
+      "panel": "modePanel",
+      "level": 2
+    },
+    {
+      "panel": "servoPanel",
+      "servo": "Elevator"
+    },
+    {
+      "panel": "servoPanel",
+      "servo": "Rudder"
+    },
+    {
+      "panel": "servoPanel",
+      "servo": "Gear"
+    },
+    {
+      "panel": "zeroAllButton"
+    },
+    {
+      "panel": "valuePanel",
+      "signal": "pitch rate",
+      "level": 1
+    },
+    {
+      "panel": "markerPanel",
+      "level": 1
+    },
+    {
+      "panel": "rcPanel",
+      "level": 2
+    },
+    {
+      "panel": "calibrationPanel",
+      "servo": "Elevator",
+      "level": 1
+    }
+  ]
+}

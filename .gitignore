@@ -1,0 +1,26 @@
+# MATLAB
+*.asv
+*.m~
+*.mex*
+*.autosave
+slprj/
+codegen/
+*.slxc
+
+# CubeGUI telemetry logs (one CSV per run, kept on the laptop)
+logs/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Editors and OS
+.DS_Store
+.vscode/
+.idea/
+
+# SITL test runs (tools/sitl/start_sitl.sh)
+tools/sitl/run/
+/.obsidian

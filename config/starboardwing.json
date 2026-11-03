@@ -1,0 +1,67 @@
+{
+  "_help": "Starboard wing, for the wind-tunnel tests (level 3). PLACEHOLDERS: the flap and aileron outputs, and FLAP_V (a flap position sensor's value from a Lua script), are guesses until the starboard wing teams say what they use. See config/README.md and docs/recipes.md.",
+  "level": 3,
+  "connection": {
+    "localPort": 14550,
+    "cubeAddress": "192.168.4.1",
+    "cubePort": 14555
+  },
+  "logging": {
+    "enabled": true,
+    "folder": "logs",
+    "extraSignals": [
+      "FLAP_V"
+    ]
+  },
+  "rates": {
+    "telemetryHz": 20,
+    "plotSeconds": 30
+  },
+  "servos": [
+    {
+      "name": "Flap",
+      "output": 5
+    },
+    {
+      "name": "Aileron",
+      "output": 6
+    }
+  ],
+  "plots": [
+    {
+      "panel": "plotPanel",
+      "signal": "Flap",
+      "height": "2x"
+    },
+    {
+      "panel": "plotPanel",
+      "signal": "Aileron"
+    },
+    {
+      "panel": "plotPanel",
+      "signal": "FLAP_V",
+      "label": "Flap sensor"
+    }
+  ],
+  "controls": [
+    {
+      "panel": "servoPanel",
+      "servo": "Flap"
+    },
+    {
+      "panel": "servoPanel",
+      "servo": "Aileron"
+    },
+    {
+      "panel": "zeroAllButton"
+    },
+    {
+      "panel": "valuePanel",
+      "signal": "FLAP_V",
+      "label": "Flap sensor"
+    },
+    {
+      "panel": "markerPanel"
+    }
+  ]
+}
