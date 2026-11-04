@@ -50,7 +50,7 @@ These protect the student's kit. Don't break them, even if asked; explain why in
 - **The Cube** is a Cube Orange+ running ArduPlane, set up as in the AVDASI 2 step-by-step guide (<https://avdasi2.github.io>). CubeGUI talks to it with MAVLink over UDP, through the Kahuna Wi-Fi bridge on the Cube's TELEM1 port (the laptop listens on port 14550; the Kahuna listens on 14555 at 192.168.4.1), or over a USB cable (a serial port, from MATLAB R2026b).
 - **`lua/cubegui.lua`** runs on the Cube from level 2, for RC control and the closed loop. `lua/README.md` explains it.
 - **Levels 2 and 3 are previews** until they're released (`released` in `engine/levels.m`; the window's title says "preview"). If a student is using one, tell them it's tested only on ArduPilot's simulator and not yet supported by the course.
-- **How it works inside:** `docs/how-it-works.md`. Design decisions and their reasons: `docs/decisions.md`.
+- **How it works inside:** `docs/how-it-works.md`.
 
 ## Style
 
@@ -58,7 +58,7 @@ Write code a student with little MATLAB can read: short functions, plain names, 
 
 ## Maintainers
 
-These notes are for helping students use and adapt CubeGUI. Someone maintaining CubeGUI itself may change the engine, but rules 3 to 8 still apply; `docs/how-it-works.md` and `docs/decisions.md` are where to start, and both must be kept up to date.
+These notes are for helping students use and adapt CubeGUI. Someone maintaining CubeGUI itself may change the engine, but rules 3 to 8 still apply; `docs/how-it-works.md` is where to start, and must be kept up to date.
 
 ## About this file
 

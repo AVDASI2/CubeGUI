@@ -110,13 +110,11 @@ It sends to UDP port 14550 on the same computer, listens on port 14555 as the Ka
 | `panels/` | The plots, sliders and buttons on the Run tab. Copy one to make your own. |
 | `engine/` | The connection, logging and safety rules. You don't need to change anything here. |
 | `lua/` | `cubegui.lua`, the script on the Cube for RC and closed-loop control (levels 2 and 3) |
-| `docs/` | How to change CubeGUI (`recipes.md`), the Cube's own log (`flight-log.md`), and, for maintainers, how it works inside, the design decisions and the spec |
+| `docs/` | How to change CubeGUI (`recipes.md`), the Cube's own log (`flight-log.md`), and, for maintainers, how it works inside (`how-it-works.md`) |
 | `scripts/` | Small step-by-step scripts used while building CubeGUI: connect, move a servo, live plot |
 | `tests/` | Automated checks. In MATLAB, run `runtests("tests")` |
 | `tools/` | `fake_cube.py`, a Python stand-in for the Cube, for testing without hardware, and `sitl/`, for testing with ArduPilot's own simulator |
 | `logs/` | Your logs: CubeGUI's CSV files and any Cube logs you download (not stored in git) |
-
-The spec CubeGUI was built to, for whoever maintains it, is [docs/requirements.md](docs/requirements.md). You don't need it to use or change CubeGUI.
 
 ## How CubeGUI was made
 

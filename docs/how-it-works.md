@@ -1,6 +1,6 @@
 # How CubeGUI works
 
-A plain description of each part of CubeGUI and how the parts connect, written from the code as it stands. It's kept up to date as the code changes. Design decisions and their reasons are in [requirements.md](requirements.md) (sections 4 and 5) and, from now on, [decisions.md](decisions.md).
+A plain description of each part of CubeGUI and how the parts connect, written from the code as it stands. It's kept up to date as the code changes.
 
 Last checked against the code: 2026-11-03, after the levels were renumbered 0–3, sliders became PWM, and the Logs panel, log download, gains box and script install were added (not yet committed).
 
@@ -174,7 +174,7 @@ The shipped panels: `plotPanel` (any signal), `servoPanel` (a slider for one ser
 
 ## Levels
 
-`engine/levels.m` lists the four capability levels, 0 to 3: Simulate, Connect and log, RC, Closed loop. (Until 3 November there were six, 1 to 6: see `decisions.md`.) The level comes from `"level"` in the settings (or `CubeGUI(Level=n)`), and decides:
+`engine/levels.m` lists the four capability levels, 0 to 3: Simulate, Connect and log, RC, Closed loop. The level comes from `"level"` in the settings (or `CubeGUI(Level=n)`), and decides:
 
 - what the engine shows: level 0 offers only the Simulated source and hides the Setup tab (by unparenting it, so it still works but isn't shown); logging, the Logs panel and the Lua values panel start at level 1; the script install box at level 2; the gains box at level 3;
 - which panels appear: each panel entry can have its own `"level"` (0 if it has none);
@@ -188,7 +188,7 @@ The window's title shows the level. `CubeGUI(Demo=true)` adds a drop-down that c
 
 ## Levels 2 and 3: RC and the closed loop
 
-From level 2, a Lua script on the Cube, `lua/cubegui.lua`, can drive servos instead of CubeGUI. Every servo stays on `SERVOn_FUNCTION = 0` throughout, so changing mode never changes the Cube's set-up. `lua/README.md` is the students' guide; `decisions.md` has the design decisions and what was checked in ArduPilot.
+From level 2, a Lua script on the Cube, `lua/cubegui.lua`, can drive servos instead of CubeGUI. Every servo stays on `SERVOn_FUNCTION = 0` throughout, so changing mode never changes the Cube's set-up. `lua/README.md` is the students' guide.
 
 **On the Cube.** The script runs 50 times a second. It decides the mode:
 
@@ -266,7 +266,7 @@ CubeGUI never arms the Cube.
 
 ## The Setup tab: reading and writing parameters
 
-`setupParameters` returns the hand-picked list: what CubeGUI needs (each servo's `SERVOn_FUNCTION` free), each servo's `SERVOn_MIN/TRIM/MAX` (its limits in CubeGUI, checked to be within 1000–2000) and `SERVOn_REVERSED`, safety (including `THR_FAILSAFE`, shown but not required: see `decisions.md`) and arming, logging and Lua, and the telemetry link. Each entry says what value is wanted (if any), how to check it, whether it's read-only, and a one-line note for students. `setup.extraParams` in the settings, or the **Add** box, adds more.
+`setupParameters` returns the hand-picked list: what CubeGUI needs (each servo's `SERVOn_FUNCTION` free), each servo's `SERVOn_MIN/TRIM/MAX` (its limits in CubeGUI, checked to be within 1000–2000) and `SERVOn_REVERSED`, safety (including `THR_FAILSAFE`, shown but not required: see the comment in `setupParameters.m`) and arming, logging and Lua, and the telemetry link. Each entry says what value is wanted (if any), how to check it, whether it's read-only, and a one-line note for students. `setup.extraParams` in the settings, or the **Add** box, adds more.
 
 **Reading:** on connect, CubeGUI sends a `PARAM_REQUEST_READ` for each name. Answers arrive as `PARAM_VALUE` and land in `Telemetry.Params`. Missing ones are re-asked once a second for 10 s; after 8 s the table says "Not on this Cube" (true, for example, of the `STEST_` parameters until `servo_slew.lua` has run).
 
@@ -296,7 +296,7 @@ Message callbacks never write to the file.
 
 ### The Logs panel and the Cube's own log
 
-The Logs panel (`buildLogsPanel`, updated by `updateLogs` in the redraw) is part of the engine. **Laptop** starts and stops `CsvLogger`; stopping saves the file, and starting makes a new one. **Cube** shows `LOG_DISARMED` and flips it between 0 and 1 through `confirmed`/`writeParams`, after a dialog showing the change. That's the only way to start and stop the Cube's log without arming: ArduPilot has no command for it and a Lua script can't (see `decisions.md`). Setting it to 0 pauses the log; the file stays open and carries on when it's set to 1 again. A download closes it, so the next start makes a new file (both seen on SITL).
+The Logs panel (`buildLogsPanel`, updated by `updateLogs` in the redraw) is part of the engine. **Laptop** starts and stops `CsvLogger`; stopping saves the file, and starting makes a new one. **Cube** shows `LOG_DISARMED` and flips it between 0 and 1 through `confirmed`/`writeParams`, after a dialog showing the change. That's the only way to start and stop the Cube's log without arming: ArduPilot has no command for it and a Lua script can't (the `logger` binding only writes: `AP_Logger.cpp`, `bindings.desc`). Setting it to 0 pauses the log; the file stays open and carries on when it's set to 1 again. A download closes it, so the next start makes a new file (both seen on SITL).
 
 **Download Cube log...** (a real Cube only, with its log stopped) uses `engine/LogDownload.m`. `list` asks for `LOG_REQUEST_LIST`; the `LOG_ENTRY` callback adds each log's number and size; once they're all in (or 3 s pass), the window offers the newest, with a time estimate. `download` asks for all of it with one `LOG_REQUEST_DATA`; the `LOG_DATA` callback copies each 90-byte piece into place and marks it arrived. `tick` (10 times a second, from `updateLogs`) asks for the next gap as soon as the range it asked for is complete, or after 1.5 s of silence (giving up after 10 silent tries), and when every piece has arrived writes the file and sends `LOG_REQUEST_END`, so the Cube goes back to logging. `LogDownload` never sends anything itself: it hands back requests, which `CubeSource.sendLogRequests` sends. So the callbacks hold the `LogDownload`, not the source, as with `Telemetry`. Disconnecting mid-download sends `LOG_REQUEST_END` too.
 

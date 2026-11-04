@@ -297,7 +297,7 @@ classdef CubeSource < DataSource
             % so the Kahuna's own messages are ignored. Each callback just
             % stores the data in the Telemetry object. They hold on to the
             % Telemetry object, not this one, so nothing here is kept alive
-            % by its own callbacks (see docs/requirements.md, section 5).
+            % by its own callbacks, and deleting the source really frees it.
             %
             % BufferSize matters. With the default of 1, a subscription keeps
             % only the newest message, so anything that arrives while MATLAB
