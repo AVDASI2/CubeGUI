@@ -19,7 +19,7 @@ Close Mission Planner before you connect. Only one program at a time can listen 
 
 ## Getting it
 
-The best way is to clone it with git, so you can update it later (MATLAB's **Source Control** > **Pull**) without losing your own changes. MATLAB can do this itself, on Windows, Mac or Linux. In the Command Window, go to the folder you want CubeGUI in, then type:
+The best way is to clone it with git, so you can update it later (MATLAB's **Source Control** > **Pull**) without losing your own changes. MATLAB can do this itself, on Windows, Mac or Linux. In **MATLAB's Command Window** (the `>>` prompt in MATLAB, not Windows' Command Prompt), go to the folder you want CubeGUI in with `cd`, then type:
 
 ```matlab
 gitclone("https://github.com/AVDASI2/CubeGUI.git")
