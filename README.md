@@ -19,7 +19,13 @@ Close Mission Planner before you connect. Only one program at a time can listen 
 
 ## Getting it
 
-The best way is to clone it with git, so you can update it later with one command (or MATLAB's **Source Control** > **Pull**) without losing your own changes:
+The best way is to clone it with git, so you can update it later (MATLAB's **Source Control** > **Pull**) without losing your own changes. MATLAB can do this itself, on Windows, Mac or Linux. In the Command Window, go to the folder you want CubeGUI in, then type:
+
+```matlab
+gitclone("https://github.com/AVDASI2/CubeGUI.git")
+```
+
+Or, if you have git installed, the same from a terminal:
 
 ```bash
 git clone https://github.com/AVDASI2/CubeGUI.git
@@ -94,10 +100,20 @@ Something not working, or a mistake in these pages? Open an issue on [GitHub](ht
 
 `tools/fake_cube.py` pretends to be a Cube on the network, so you can test the real connection at a desk. It needs Python 3 and pymavlink:
 
+On a Mac or Linux, in a terminal in the `CubeGUI` folder:
+
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install pymavlink
 .venv/bin/python tools/fake_cube.py
+```
+
+On Windows, in PowerShell or Command Prompt in the `CubeGUI` folder:
+
+```bat
+py -m venv .venv
+.venv\Scripts\pip install pymavlink
+.venv\Scripts\python tools\fake_cube.py
 ```
 
 It sends to UDP port 14550 on the same computer, listens on port 14555 as the Kahuna does, and prints every command it receives. `tools/gcs_check.py` is a quick Python check that a Cube, real or fake, answers the way CubeGUI expects. For testing with ArduPilot itself, see [tools/sitl/README.md](tools/sitl/README.md).
