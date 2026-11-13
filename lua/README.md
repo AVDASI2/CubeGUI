@@ -46,7 +46,7 @@ All of these are in CubeGUI's **Setup** tab at level 2 (and in Mission Planner's
 
 To find which channel a stick or switch is on, open CubeGUI's **RC transmitter** panel, move it, and watch which bar moves. Then add that channel's `RCn_OPTION` in the Setup tab (type e.g. `RC7_OPTION` in **Add parameter**) and set it. A switch needs to go below 1200 at one end and above 1800 at the other.
 
-The switches work the same way as in the guide's `avdasi2.lua` (page 06c), but **don't install both scripts**: they would fight over the servos.
+The switches work the same way as in the guide's `avdasi2.lua` (page 06c), but **don't install both scripts**: they would fight over the servos. If `avdasi2.lua` is running, CubeGUI's Setup tab shows `AVDASI2_RC_FUNC` as **Remove avdasi2.lua**, and won't copy `cubegui.lua` until it's gone: delete it from `APM/scripts` and reboot.
 
 **The transmitter's receiver should send no pulses when it loses the signal** (its failsafe setting), so the Cube can tell the signal has gone. Check your receiver's manual for how to set that.
 
@@ -96,4 +96,4 @@ It also writes a `CGUI` entry into the Cube's own log 10 times a second (mode, S
 
 ## Tested
 
-On ArduPilot's simulator (SITL), built from ArduPilot's own source on 2026-11-01, for both **ArduPlane 4.6.3** and the 4.8 development version. Tested: the three modes, both switches, CubeGUI's commands being ignored while the script drives, `SERVOn_MIN`/`MAX` and `REVERSED` being honoured, `CGUI_ENABLE`, and losing the RC signal with `THR_FAILSAFE = 2`; also CubeGUI end to end. Copying the script from CubeGUI was tested on SITL on 2026-11-03. **Not yet tested on a real Cube.** `tools/sitl/` has the tests.
+On ArduPilot's simulator (SITL), built from ArduPilot's own source on 2026-11-01, for both **ArduPlane 4.6.3** and the 4.8 development version. Tested: the three modes, both switches, CubeGUI's commands being ignored while the script drives, `SERVOn_MIN`/`MAX` and `REVERSED` being honoured, `CGUI_ENABLE`, and losing the RC signal with `THR_FAILSAFE = 2`; also CubeGUI end to end. Copying the script from CubeGUI was tested on SITL on 2026-11-03. On a real Cube, Robin has run RC and the closed loop with CubeGUI (November 2026, perhaps not with the very latest version); a last check of the current version is due before level 2 is released. `tools/sitl/` has the tests.

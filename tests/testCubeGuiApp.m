@@ -340,6 +340,25 @@ verifyEqual(tc, numel(panels), 1)
 verifyEqual(tc, string(panels.Visible), "on")
 end
 
+function testAvdasi2ScriptFlagged(tc)
+% The guide's avdasi2.lua uses the same switches as cubegui.lua. Its
+% parameters only exist while it runs, so AVDASI2_RC_FUNC on the Cube
+% means "remove it" in the Setup tab (level 2 and up only).
+app = openWith(tc, @(c) setfield(c, "level", 1));
+names = [setupParameters(app.Config.servos, strings(1, 0), 1).name];
+verifyFalse(tc, ismember("AVDASI2_RC_FUNC", names), "Not shown at level 1.")
+app = openWith(tc, @(c) setfield(c, "level", 2));
+app.connect("Simulated");
+app.Telemetry.addParam("AVDASI2_RC_FUNC", 300);
+tabs = findall(app.Figure, "Type", "uitab");   % the Setup table updates only while it's showing
+tabs(1).Parent.SelectedTab = tabs(string({tabs.Title}) == "Setup");
+pause(2)
+tables = findall(app.Figure, "Type", "uitable");
+rows = tables(arrayfun(@(t) any(strcmp(t.ColumnName, "Parameter")), tables)).Data;
+row = rows(string(rows{:, 2}) == "AVDASI2_RC_FUNC", :);
+verifyEqual(tc, string(row{1, 5}), "Remove avdasi2.lua")
+end
+
 function testUnreleasedLevelsSayPreview(tc)
 % Levels in the code but not yet released say so, in the title and the status line.
 app = openWith(tc, @(c) setfield(c, "level", 2));

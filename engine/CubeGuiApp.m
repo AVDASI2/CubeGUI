@@ -933,6 +933,16 @@ classdef CubeGuiApp < handle
                 obj.setStatus("Set SCR_ENABLE to 1 and reboot the Cube first, so it runs scripts.", true);
                 return
             end
+            if ~isnan(obj.Telemetry.param("AVDASI2_RC_FUNC"))
+                % avdasi2.lua's parameters exist only while it runs (setupParameters.m).
+                message = "The guide's avdasi2.lua is running on this Cube. It uses the same " + ...
+                    "switches as cubegui.lua and they'd fight over the servos. Remove avdasi2.lua " + ...
+                    "from APM/scripts on the SD card (Mission Planner's MAVFTP, or the card in a " + ...
+                    "computer), reboot, then copy cubegui.lua.";
+                obj.setStatus("Remove avdasi2.lua first: see the Setup tab.", true);
+                uialert(obj.Figure, message, "avdasi2.lua is running");
+                return
+            end
             file = fullfile(fileparts(mfilename("fullpath")), "..", "lua", "cubegui.lua");
             path = obj.Source.ScriptFolder + "/cubegui.lua";
             info = dir(file);
@@ -1614,10 +1624,10 @@ classdef CubeGuiApp < handle
                         status(k) = "Writing...";
                     elseif ~isnan(target) && ~sameValue(target, value)
                         status(k) = ifElse(isKey(obj.Edits, c.name), "Changed: Apply", "Needs changing");
+                    elseif ~c.isOk(value)
+                        status(k) = c.problem;
                     elseif c.readOnly
                         status(k) = "Read-only";
-                    elseif ~c.isOk(value)
-                        status(k) = "Out of range";
                     elseif ~isnan(c.wanted)
                         status(k) = "OK";
                     else

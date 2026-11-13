@@ -16,6 +16,7 @@ function params = setupParameters(servos, extraNames, level)
 %     isOk      a function: isOk(value) is true if the current value is fine
 %     readOnly  true for parameters CubeGUI shows but won't let you change
 %     why       a plain-English note, shown in the table
+%     problem   the status shown when isOk(value) is false (normally "Out of range")
 %
 %   extraNames adds more parameters by name (from the settings file), under
 %   "Your parameters", at every level.
@@ -27,7 +28,7 @@ if nargin < 3
     level = 3;
 end
 params = struct("level", {}, "group", {}, "name", {}, "wanted", {}, "isOk", {}, ...
-    "readOnly", {}, "why", {});
+    "readOnly", {}, "why", {}, "problem", {});
 anyValue = @(v) true;
 
 % ---- Level 1: what CubeGUI needs to drive the servos ---------------------------
@@ -63,8 +64,8 @@ params(end+1) = entry(1, g, "BRD_SAFETY_DEFLT", NaN, anyValue, false, ...
 % THR_FAILSAFE doesn't matter for CubeGUI's servos below level 2: a
 % disarmed Plane that has never heard an RC receiver skips the RC failsafe
 % check (ArduPlane's radio.cpp, allow_failsafe_bypass), and a failsafe only
-% changes the flight mode, not outputs with function 0. The guide sets 0
-% so the Cube can be armed without RC. From level 2 there's a receiver, and
+% changes the flight mode, not outputs with function 0. The guide leaves it
+% at ArduPlane's default, 1 (Parameters.cpp). From level 2 there's a receiver, and
 % with 0 the Cube never declares RC lost, so cubegui.lua would carry on with
 % the last stick positions. 2 detects the loss and stops RC being used,
 % without a failsafe action (Parameters.cpp, RC_Channel_Plane.cpp).
@@ -73,7 +74,7 @@ if level >= 2
         "2 lets the Cube notice if the transmitter's signal is lost, so cubegui.lua stops using the sticks. It doesn't arm or change mode.");
 else
     params(end+1) = entry(1, g, "THR_FAILSAFE", NaN, anyValue, false, ...
-        "RC failsafe. Any value is fine for CubeGUI, which never arms the Cube. The guide sets 0, which only matters for arming without an RC receiver.");
+        "RC failsafe. Any value is fine for CubeGUI, which never arms the Cube. The guide leaves it at its default, 1.");
 end
 
 g = "Telemetry link (TELEM1)";
@@ -110,6 +111,17 @@ params(end+1) = entry(2, g, "BRD_SAFETY_MASK", NaN, anyValue, false, ...
     "Outputs that work even with the safety switch on. Add up 2^(n-1) for each output n: output 5 is 16.");
 params(end+1) = entry(2, g, "ARMING_CHECK", NaN, anyValue, false, ...
     "Which checks the Cube runs before arming. CubeGUI never arms the Cube.");
+
+% ---- Level 2: the guide's avdasi2.lua, which mustn't run alongside cubegui.lua ----------
+% avdasi2.lua (guide page 06c) uses the same transmitter switches (RCn_OPTION
+% 300 and 301) but hands servos back to the autopilot by changing
+% SERVOn_FUNCTION, so the two scripts would fight over the servos. A script's
+% parameters only exist once it has started this boot (AP_Param::add_table),
+% so AVDASI2_RC_FUNC being on the Cube means avdasi2.lua is running.
+params(end+1) = entry(2, "Other scripts", "AVDASI2_RC_FUNC", NaN, @(v) false, true, ...
+    ['Only here while the guide''s avdasi2.lua is running. It uses the same switches as ' ...
+     'cubegui.lua and they''d fight over the servos: remove avdasi2.lua from APM/scripts, ' ...
+     'then reboot. "Not on this Cube" is what you want.'], "Remove avdasi2.lua");
 
 % ---- Level 2: cubegui.lua, the script that lets RC and the closed loop drive ----------
 % "Not on this Cube" for these means the script isn't running: see lua/README.md.
@@ -154,7 +166,11 @@ end
 params = params([params.level] <= level);
 end
 
-function e = entry(level, group, name, wanted, isOk, readOnly, why)
+function e = entry(level, group, name, wanted, isOk, readOnly, why, problem)
+% problem is the status shown when isOk(value) is false.
+if nargin < 8
+    problem = "Out of range";
+end
 e = struct("level", level, "group", string(group), "name", string(name), "wanted", wanted, ...
-    "isOk", isOk, "readOnly", readOnly, "why", string(why));
+    "isOk", isOk, "readOnly", readOnly, "why", string(why), "problem", string(problem));
 end
