@@ -26,13 +26,6 @@ classdef (Abstract) DataSource < handle
         ServoLimits = NaN(16, 2)
     end
 
-    properties (Constant)
-        % Limits outside this range are refused, not clamped: a typo in a
-        % Cube parameter mustn't send a servo to an extreme.
-        HardMinPwm = 1000
-        HardMaxPwm = 2000
-    end
-
     methods (Abstract)
         connect(obj)
         disconnect(obj)
@@ -115,14 +108,11 @@ classdef (Abstract) DataSource < handle
     methods (Static)
         function problem = limitsProblem(minPwm, trimPwm, maxPwm)
             % "" if these limits are usable, or else what's wrong with them,
-            % in a few words.
-            low = DataSource.HardMinPwm;
-            high = DataSource.HardMaxPwm;
+            % in a few words. There's no fixed range: some servos travel
+            % further with 500 to 2500 us, so the Cube's limits are trusted
+            % as long as they're in order. Check the servo's datasheet.
             if any(isnan([minPwm, trimPwm, maxPwm]))
                 problem = "not all read from the Cube yet";
-            elseif minPwm < low || maxPwm > high
-                problem = string(sprintf("limits %g to %g µs go outside %d to %d µs", ...
-                    minPwm, maxPwm, low, high));
             elseif ~(minPwm < trimPwm && trimPwm < maxPwm)
                 problem = string(sprintf("needs MIN < TRIM < MAX, but they're %g, %g and %g", ...
                     minPwm, trimPwm, maxPwm));

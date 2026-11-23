@@ -43,17 +43,18 @@ end
 
 % CubeGUI uses MIN, TRIM and MAX as each servo's limits: percent on the
 % slider is worked out from them, and nothing outside MIN to MAX is sent.
-% Anything outside 1000 to 2000 us is refused.
-inRange = @(v) v >= DataSource.HardMinPwm && v <= DataSource.HardMaxPwm;
+% There's no fixed range (some servos use 500 to 2500 us), so any number is
+% accepted here; Cube.updateLimits refuses them if they're not in order.
+inRange = @(v) isfinite(v) && v > 0;
 for s = reshape(servos, 1, [])
     g = sprintf("Output %d (%s)", s.output, s.name);
     n = s.output;
     params(end+1) = entry(1, g, sprintf("SERVO%d_MIN", n), NaN, inRange, false, ...
-        "Lowest PWM for this servo: -100 % on the slider. CubeGUI never sends less. 1000 to 2000."); %#ok<AGROW>
+        "Lowest PWM for this servo: -100 % on the slider. CubeGUI never sends less. Check the servo's datasheet."); %#ok<AGROW>
     params(end+1) = entry(1, g, sprintf("SERVO%d_TRIM", n), NaN, inRange, false, ...
         "Centre PWM: 0 % on the slider, and where Zero all sends it. Between MIN and MAX."); %#ok<AGROW>
     params(end+1) = entry(1, g, sprintf("SERVO%d_MAX", n), NaN, inRange, false, ...
-        "Highest PWM for this servo: +100 % on the slider. CubeGUI never sends more. 1000 to 2000."); %#ok<AGROW>
+        "Highest PWM for this servo: +100 % on the slider. CubeGUI never sends more. Check the servo's datasheet."); %#ok<AGROW>
     params(end+1) = entry(1, g, sprintf("SERVO%d_REVERSED", n), NaN, anyValue, false, ...
         "1 reverses the output when the Cube itself drives it, from RC say. It doesn't reverse CubeGUI's slider."); %#ok<AGROW>
 end

@@ -96,7 +96,7 @@ Add an entry to `controls`:
 
 4. Start CubeGUI, connect, and open the **Setup** tab:
    - **`SERVO8_FUNCTION`** must be 0. If it isn't, CubeGUI fills in 0 for you, and **Apply changes...** writes it.
-   - **`SERVO8_MIN`, `SERVO8_TRIM` and `SERVO8_MAX`** are the servo's limits, from 1000 to 2000 µs. CubeGUI never sends anything outside MIN to MAX. Set them to suit your mechanism before you connect it to anything.
+   - **`SERVO8_MIN`, `SERVO8_TRIM` and `SERVO8_MAX`** are the servo's limits, usually 1000 to 2000 µs (check the servo's datasheet). CubeGUI never sends anything outside MIN to MAX. Set them to suit your mechanism before you connect it to anything.
 
 ## Recipe 5: work in degrees instead of PWM
 

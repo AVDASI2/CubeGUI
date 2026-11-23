@@ -521,8 +521,8 @@ classdef Cube < handle
         function updateLimits(obj)
             % Give each servo the Cube's SERVOn_MIN, _TRIM and _MAX, once
             % they've arrived, and again whenever they change (after a write
-            % in the Setup tab, say). Limits outside 1000 to 2000 us are
-            % refused: that servo is switched off until they're fixed. The
+            % in the Setup tab, say). Limits not in the order MIN < TRIM < MAX
+            % are refused: that servo is switched off until they're fixed. The
             % Cube doesn't hold DO_SET_SERVO to its limits itself (checked
             % in ArduPilot's AP_ServoRelayEvents.cpp and SRV_Channel.cpp).
             tel = obj.Telemetry;

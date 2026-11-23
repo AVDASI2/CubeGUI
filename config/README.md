@@ -59,7 +59,7 @@ Each servo's limits are the Cube's own parameters: `SERVOn_MIN`, `SERVOn_TRIM` a
 
 - CubeGUI never sends anything below `SERVOn_MIN` or above `SERVOn_MAX`, whatever the slider says. The Cube itself doesn't check, so this matters.
 - Zero all sends `SERVOn_TRIM`.
-- All three must be between 1000 and 2000 µs, with MIN below TRIM below MAX. If they aren't, CubeGUI won't drive that servo at all until they're fixed.
+- MIN must be below TRIM, and TRIM below MAX. If they aren't, CubeGUI won't drive that servo at all until they're fixed. There's no fixed range: many servos use 1000 to 2000 µs, some travel further with 500 to 2500 µs. Check the servo's datasheet, and watch for it stalling against its end stop.
 
 The same parameters apply when the Cube drives the servo itself, for example from an RC transmitter, so one set of limits covers every way of moving it.
 

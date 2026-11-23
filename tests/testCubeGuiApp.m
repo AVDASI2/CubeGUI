@@ -90,11 +90,11 @@ verifyEqual(tc, app.commandServo(3, 1650), 1650)
 verifyEqual(tc, app.commandServo(1, 1900), 1900)   % the elevator is unchanged
 end
 
-function testOutOfRangeLimitsSwitchServoOff(tc)
-% A limit outside 1000 to 2000 us: that servo isn't driven at all.
+function testLimitsOutOfOrderSwitchServoOff(tc)
+% MAX below TRIM: that servo isn't driven at all.
 app = tc.TestData.app;
 app.connect("Simulated");
-app.setNewValue("SERVO6_MAX", 2100);
+app.setNewValue("SERVO6_MAX", 1400);
 app.applySetup(false);
 offLabel = @() any(string({findall(app.Figure, "Type", "uilabel").Text}) == ...
     "Its limits on the Cube need fixing.");

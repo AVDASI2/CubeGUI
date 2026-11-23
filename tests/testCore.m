@@ -50,16 +50,18 @@ end
 function testLimitsProblem(tc)
 verifyEqual(tc, DataSource.limitsProblem(1100, 1500, 1900), "")
 verifyEqual(tc, DataSource.limitsProblem(1000, 1500, 2000), "")
-verifyNotEqual(tc, DataSource.limitsProblem(900, 1500, 1900), "")    % below 1000
-verifyNotEqual(tc, DataSource.limitsProblem(1100, 1500, 2100), "")   % above 2000
+verifyEqual(tc, DataSource.limitsProblem(500, 1500, 2500), "")       % no fixed range
+verifyNotEqual(tc, DataSource.limitsProblem(1900, 1500, 1100), "")   % MIN and MAX swapped
 verifyNotEqual(tc, DataSource.limitsProblem(1100, 1950, 1900), "")   % trim outside
 verifyNotEqual(tc, DataSource.limitsProblem(1100, NaN, 1900), "")    % not read yet
 end
 
-function testLimitsOutsideHardRangeRefused(tc)
+function testServoLimitsHaveNoFixedRange(tc)
+% A 500 to 2500 us servo is fine; limits in the wrong order aren't.
 src = SimulatedSource(Telemetry(30, 20));
-verifyError(tc, @() src.setServoLimits(5, 900, 1900), "CubeGUI:limits")
-verifyError(tc, @() src.setServoLimits(5, 1100, 2100), "CubeGUI:limits")
+src.setServoLimits(5, 500, 2500);
+verifyEqual(tc, src.ServoLimits(5, :), [500 2500])
+verifyError(tc, @() src.setServoLimits(5, 1900, 1100), "CubeGUI:limits")
 end
 
 function testConfigRejectsMissingEntry(tc)
