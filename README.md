@@ -57,7 +57,7 @@ CubeGUI unlocks features in stages, as the unit goes on. The window's title show
 
 **Level 3 is a preview.** It's in the code so you can see where CubeGUI is going, and you're welcome to look. But it's only been tested on ArduPilot's simulator and briefly on a kit, and **it isn't supported until it's released**: we won't help with it before then. It's planned for later in the unit (date to be confirmed), in TB2. The window's title says "preview" at that level.
 
-**Setting up the transmitter** for level 2 (binding the receiver, the switches) is on the AVDASI 2 guide's [RC page](https://avdasi2.github.io/avionics/stepbystep/06-rc/).
+**Setting up the transmitter** for level 2 (binding the receiver, the switches) is on the AVDASI 2 guide's [RC page](https://avdasi2.github.io/avionics/stepbystep/08-rc/).
 
 Levels 2 and 3 need a Lua script, `cubegui.lua`, on the Cube: [lua/README.md](lua/README.md) explains how to install and set it up.
 

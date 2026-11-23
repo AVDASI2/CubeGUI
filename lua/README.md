@@ -4,7 +4,7 @@
 > **Not for flight.** This script has been tested on ArduPilot's simulator and is meant for a model held on a wind-tunnel or bench rig. It is not a flight controller and must not be used on anything that flies.
 
 > [!NOTE]
-> **Level 2 (RC) is released; level 3 (the closed loop) is a preview**, not supported until it's released. Setting up the transmitter itself (binding the receiver, the switches) is on the AVDASI 2 guide's [RC page](https://avdasi2.github.io/avionics/stepbystep/06-rc/).
+> **Level 2 (RC) is released; level 3 (the closed loop) is a preview**, not supported until it's released. Setting up the transmitter itself (binding the receiver, the switches) is on the AVDASI 2 guide's [RC page](https://avdasi2.github.io/avionics/stepbystep/08-rc/).
 
 `cubegui.lua` runs on the Cube and decides who drives the servos:
 
@@ -28,7 +28,7 @@ With CubeGUI, at level 2 or above, connected to the Cube over the Wi-Fi or a USB
 
 Copy it again the same way whenever `lua/cubegui.lua` is updated. (CubeGUI uses MAVLink's file transfer protocol, the same as Mission Planner's MAVFtp window. Mission Planner still works for this too: **CONFIG** > **MAVFtp**, go to `APM` > `scripts`, right-click, **Upload**.)
 
-This is the same as the guide's `servo_slew.lua` page (06a). If `servo_slew.lua` is still in `APM/scripts`, set `STEST_CHAN` to 0, or delete it, so the two don't fight over output 5.
+This is the same as the guide's `servo_slew.lua` page (06). If `servo_slew.lua` is still in `APM/scripts`, set `STEST_CHAN` to 0, or delete it, so the two don't fight over output 5.
 
 ## Setting it up
 
@@ -46,7 +46,7 @@ All of these are in CubeGUI's **Setup** tab at level 2 (and in Mission Planner's
 
 To find which channel a stick or switch is on, open CubeGUI's **RC transmitter** panel, move it, and watch which bar moves. Then add that channel's `RCn_OPTION` in the Setup tab (type e.g. `RC7_OPTION` in **Add parameter**) and set it. A switch needs to go below 1200 at one end and above 1800 at the other.
 
-The switches work the same way as in the guide's `avdasi2.lua` (page 06c), but **don't install both scripts**: they would fight over the servos. If `avdasi2.lua` is running, CubeGUI's Setup tab shows `AVDASI2_RC_FUNC` as **Remove avdasi2.lua**, and won't copy `cubegui.lua` until it's gone: delete it from `APM/scripts` and reboot.
+The switches work the same way as in the guide's `avdasi2.lua` (page 08a), but **don't install both scripts**: they would fight over the servos. If `avdasi2.lua` is running, CubeGUI's Setup tab shows `AVDASI2_RC_FUNC` as **Remove avdasi2.lua**, and won't copy `cubegui.lua` until it's gone: delete it from `APM/scripts` and reboot.
 
 **The transmitter's receiver should send no pulses when it loses the signal** (its failsafe setting), so the Cube can tell the signal has gone. Check your receiver's manual for how to set that.
 

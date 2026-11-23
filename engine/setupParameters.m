@@ -114,7 +114,7 @@ params(end+1) = entry(2, g, "ARMING_CHECK", NaN, anyValue, false, ...
     "Which checks the Cube runs before arming. CubeGUI never arms the Cube.");
 
 % ---- Level 2: the guide's avdasi2.lua, which mustn't run alongside cubegui.lua ----------
-% avdasi2.lua (guide page 06c) uses the same transmitter switches (RCn_OPTION
+% avdasi2.lua (guide page 08a) uses the same transmitter switches (RCn_OPTION
 % 300 and 301) but hands servos back to the autopilot by changing
 % SERVOn_FUNCTION, so the two scripts would fight over the servos. A script's
 % parameters only exist once it has started this boot (AP_Param::add_table),
