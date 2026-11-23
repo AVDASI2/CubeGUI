@@ -182,7 +182,7 @@ The shipped panels: `plotPanel` (any signal), `servoPanel` (a slider for one ser
 
 The tunnel profiles (`config/fuselage.json` and the wings) are settings files at level 3, not a level of their own.
 
-Each level also has `released`. Levels 2 and 3 are false for now: they work, but aren't released to students. At such a level the window's title ends "(preview: not released yet)", the status line says so in red when the window opens, and the demo drop-down marks them "(preview)". Releasing a level means setting it to true.
+Each level also has `released`. Level 3 is false for now: it works, but isn't released to students (level 2 was released in November 2026). At such a level the window's title ends "(preview: not released yet)", the status line says so in red when the window opens, and the demo drop-down marks them "(preview)". Releasing a level means setting it to true.
 
 The window's title shows the level. `CubeGUI(Demo=true)` adds a drop-down that closes the window and opens it again at the chosen level (`changeLevel`). Levels hide features; they don't lock them.
 

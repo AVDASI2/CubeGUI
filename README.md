@@ -50,12 +50,14 @@ CubeGUI unlocks features in stages, as the unit goes on. The window's title show
 |---|---|---|---|
 | 0 | Simulate | The Simulated source, its plots, and sliders that drive the simulation | Released |
 | 1 | Connect and log | The real Cube, over the Wi-Fi or a USB cable; the safety switch, the servos and the Setup tab, with flashing ArduPlane and resetting to a fresh Cube; logging to CSV; starting, stopping and downloading the Cube's own log; run markers; values from Lua scripts; calibration | Released |
-| 2 | RC | Control from your transmitter, a display of who's in charge, and installing `cubegui.lua` from the Setup tab | **Preview** |
+| 2 | RC | Control from your transmitter, a display of who's in charge, and installing `cubegui.lua` from the Setup tab | Released |
 | 3 | Closed loop | A pitch controller on the Cube, with its target and gains in CubeGUI | **Preview** |
 
-`CubeGUI` opens at level 1.
+`CubeGUI` opens at level 1. For RC, open it at level 2 with `CubeGUI(Level=2)`, or set `"level": 2` in your settings file.
 
-**Levels 2 and 3 are previews.** They're in the code so you can see where CubeGUI is going, and you're welcome to look. But they've only been tested on ArduPilot's simulator, not on the kits, and **they aren't supported until they're released**: we won't help with them before then. They're planned for later in the unit (dates to be confirmed): RC before Gate 2a, and the closed loop in TB2. The window's title says "preview" at those levels.
+**Level 3 is a preview.** It's in the code so you can see where CubeGUI is going, and you're welcome to look. But it's only been tested on ArduPilot's simulator and briefly on a kit, and **it isn't supported until it's released**: we won't help with it before then. It's planned for later in the unit (date to be confirmed), in TB2. The window's title says "preview" at that level.
+
+**Setting up the transmitter** for level 2 (binding the receiver, the switches) is on the AVDASI 2 guide's [RC page](https://avdasi2.github.io/avionics/stepbystep/06-rc/).
 
 Levels 2 and 3 need a Lua script, `cubegui.lua`, on the Cube: [lua/README.md](lua/README.md) explains how to install and set it up.
 
@@ -94,7 +96,7 @@ To add a plot, a servo, a button or a readout, see [docs/recipes.md](docs/recipe
 
 ## Reporting a problem
 
-Something not working, or a mistake in these pages? Open an issue on [GitHub](https://github.com/AVDASI2/CubeGUI/issues): say what you did, what happened, and paste the message from CubeGUI's status line or MATLAB's Command Window. Levels 2 and 3 are previews, so they aren't supported yet.
+Something not working, or a mistake in these pages? Open an issue on [GitHub](https://github.com/AVDASI2/CubeGUI/issues): say what you did, what happened, and paste the message from CubeGUI's status line or MATLAB's Command Window. Level 3 is a preview, so it isn't supported yet.
 
 ## Testing without a Cube
 

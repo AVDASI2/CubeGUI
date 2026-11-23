@@ -361,12 +361,12 @@ end
 
 function testUnreleasedLevelsSayPreview(tc)
 % Levels in the code but not yet released say so, in the title and the status line.
-app = openWith(tc, @(c) setfield(c, "level", 2));
-verifyEqual(tc, string(app.Figure.Name), "CubeGUI, level 2 of 3: RC (preview: not released yet)")
+app = openWith(tc, @(c) setfield(c, "level", 3));
+verifyEqual(tc, string(app.Figure.Name), "CubeGUI, level 3 of 3: Closed loop (preview: not released yet)")
 labels = string({findall(app.Figure, "Type", "uilabel").Text});
-verifyTrue(tc, any(startsWith(labels, "Level 2 is a preview")))
-app = openWith(tc, @(c) setfield(c, "level", 1));
-verifyEqual(tc, string(app.Figure.Name), "CubeGUI, level 1 of 3: Connect and log")
+verifyTrue(tc, any(startsWith(labels, "Level 3 is a preview")))
+app = openWith(tc, @(c) setfield(c, "level", 2));
+verifyEqual(tc, string(app.Figure.Name), "CubeGUI, level 2 of 3: RC")
 end
 
 function testPanelsHaveLevels(tc)

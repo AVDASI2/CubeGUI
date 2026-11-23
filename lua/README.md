@@ -4,7 +4,7 @@
 > **Not for flight.** This script has been tested on ArduPilot's simulator and is meant for a model held on a wind-tunnel or bench rig. It is not a flight controller and must not be used on anything that flies.
 
 > [!NOTE]
-> **A preview.** Levels 2 and 3, which use this script, aren't released yet: they've been tested on ArduPilot's simulator but not on the kits, and aren't supported until they're released.
+> **Level 2 (RC) is released; level 3 (the closed loop) is a preview**, not supported until it's released. Setting up the transmitter itself (binding the receiver, the switches) is on the AVDASI 2 guide's [RC page](https://avdasi2.github.io/avionics/stepbystep/06-rc/).
 
 `cubegui.lua` runs on the Cube and decides who drives the servos:
 
@@ -20,10 +20,10 @@ You need it from level 2. It needs ArduPlane 4.5 or later: the Setup tab shows t
 
 ## Installing it
 
-With CubeGUI, at level 2 or above, connected to the Cube over the Wi-Fi:
+With CubeGUI, at level 2 or above, connected to the Cube over the Wi-Fi or a USB cable:
 
 1. In the **Setup** tab, `SCR_ENABLE` shows "Needs changing", with 1 filled in. Click **Apply changes...** and confirm. CubeGUI then offers to reboot the Cube, which `SCR_ENABLE` needs: click **Reboot now**. (Or reboot later with **Reboot Cube...**, or by powering it off and on.) CubeGUI stays connected through the reboot.
-2. In the Setup tab's **cubegui.lua on the Cube** box, click **Copy cubegui.lua to the Cube...** and confirm. CubeGUI copies `lua/cubegui.lua` to `APM/scripts` on the Cube's SD card over the Wi-Fi (about 12 kB, so a few seconds), then restarts the Cube's scripts.
+2. In the Setup tab's **cubegui.lua on the Cube** box, click **Copy cubegui.lua to the Cube...** and confirm. CubeGUI copies `lua/cubegui.lua` to `APM/scripts` on the Cube's SD card (about 12 kB, so a few seconds), then restarts the Cube's scripts.
 3. On the Run tab, the **Who's in charge** panel should say **"Script running"** within a few seconds. If it says "no script heard", see Troubleshooting below.
 
 Copy it again the same way whenever `lua/cubegui.lua` is updated. (CubeGUI uses MAVLink's file transfer protocol, the same as Mission Planner's MAVFtp window. Mission Planner still works for this too: **CONFIG** > **MAVFtp**, go to `APM` > `scripts`, right-click, **Upload**.)
@@ -36,7 +36,7 @@ All of these are in CubeGUI's **Setup** tab at level 2 (and in Mission Planner's
 
 | Parameter | What to set |
 |---|---|
-| `THR_FAILSAFE` | **2**, so the Cube notices when the transmitter's signal is lost and stops using the sticks. CubeGUI fills this in for you at level 2. |
+| `THR_FAILSAFE` | **1** (ArduPlane's default) **or 2**, so the Cube notices when the transmitter's signal is lost and stops using the sticks. CubeGUI checks it at level 2, and suggests 2. |
 | `RCn_OPTION` = **300** | On the channel of the **mode switch** (`n` is its channel number, e.g. `RC7_OPTION`): **low** RC, **high** CubeGUI, **middle** no change. With it high, CubeGUI can choose the closed loop. No channel with 300: CubeGUI chooses. |
 | `RCn_OPTION` = **301** | On the channel of the **SAS switch** (pitch damping in RC mode): **low** off, **high** on, **middle** no change. None: CubeGUI chooses. |
 | `CGUI_MODE_FUNC`, `CGUI_SAS_FUNC` | 300 and 301: the `RCn_OPTION` values the script looks for. Leave them alone unless another script uses 300 or 301. |
@@ -96,4 +96,4 @@ It also writes a `CGUI` entry into the Cube's own log 10 times a second (mode, S
 
 ## Tested
 
-On ArduPilot's simulator (SITL), built from ArduPilot's own source on 2026-11-01, for both **ArduPlane 4.6.3** and the 4.8 development version. Tested: the three modes, both switches, CubeGUI's commands being ignored while the script drives, `SERVOn_MIN`/`MAX` and `REVERSED` being honoured, `CGUI_ENABLE`, and losing the RC signal with `THR_FAILSAFE = 2`; also CubeGUI end to end. Copying the script from CubeGUI was tested on SITL on 2026-11-03. On a real Cube, Robin has run RC and the closed loop with CubeGUI (November 2026, perhaps not with the very latest version); a last check of the current version is due before level 2 is released. `tools/sitl/` has the tests.
+On ArduPilot's simulator (SITL), built from ArduPilot's own source on 2026-11-01, for both **ArduPlane 4.6.3** and the 4.8 development version. Tested: the three modes, both switches, CubeGUI's commands being ignored while the script drives, `SERVOn_MIN`/`MAX` and `REVERSED` being honoured, `CGUI_ENABLE`, and losing the RC signal with `THR_FAILSAFE = 2`; also CubeGUI end to end. Copying the script from CubeGUI was tested on SITL on 2026-11-03. On a real Cube (November 2026): RC with both switches, copying the script over the Wi-Fi and over USB, and losing the signal (with the receiver's failsafe on "No pulses", turning the transmitter off gave CubeGUI the servos back). Robin has also run the closed loop on a kit. `tools/sitl/` has the tests.
