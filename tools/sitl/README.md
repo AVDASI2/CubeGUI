@@ -85,11 +85,12 @@ SITL keeps its parameters in `tools/sitl/run/eeprom.bin`. Delete the `run` folde
 
 ## What the tests check
 
-`test_cubegui_lua.py` checks 30 things on the running script, and sets `RC8_OPTION` and `RC9_OPTION` back to 0 when it's done:
+`test_cubegui_lua.py` checks 34 things on the running script, repeating CubeGUI's request once a second as CubeGUI does, and sets `RC8_OPTION` and `RC9_OPTION` back to 0 when it's done:
 
 - it starts and reports;
 - **CubeGUI mode:** `DO_SET_SERVO` works;
 - **closed loop:** the script drives the elevator, CubeGUI's commands are ignored, and the target's direction is right;
+- **CubeGUI goes quiet** for 3 s in closed loop: `CG_MODE` 3, the elevator held still and `DO_SET_SERVO` still ignored, then closed loop again once CubeGUI is heard;
 - **back to CubeGUI:** its commands work again;
 - **RC mode from a switch:** sticks drive their outputs within `SERVOn_MIN`/`MAX`, follow a changed limit, and honour `SERVOn_REVERSED` with uneven limits;
 - the switches found by `RCn_OPTION`: the SAS switch, all three mode switch positions (middle changes nothing), the switch already low when the script starts, no switch at all, and `CGUI_ENABLE = 0`;
@@ -97,4 +98,4 @@ SITL keeps its parameters in `tools/sitl/run/eeprom.bin`. Delete the `run` folde
 
 `test_logs_and_upload.m` checks that `LOG_DISARMED` starts the Cube's log, that setting it to 0 stops the file growing, and that starting again carries on in the same file; that the newest log downloads complete, as a `.BIN` file; and that `cubegui.lua` copies over MAVFTP byte for byte, and the script reports again after the restart. SITL sends logs at USB speed, so its download time isn't a guide to the Wi-Fi.
 
-Last run, 2026-11-03, against ArduPlane 4.8-dev: 30 of 30, 14 of 14, and 8 of 8. `test_usb_connection.m`: 6 of 6 on 2026-11-04. (On 2026-11-01 the first two also passed against ArduPlane 4.6.3.)
+Last run, 2026-11-23, against ArduPlane 4.8-dev: 34 of 34 and 14 of 14 (2026-11-03: 8 of 8 for the logs and upload). `test_usb_connection.m`: 6 of 6 on 2026-11-04. (On 2026-11-01 the first two also passed against ArduPlane 4.6.3.)

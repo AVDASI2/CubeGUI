@@ -14,17 +14,23 @@ m = mavutil.mavlink_connection("udpin:127.0.0.1:14571", source_system=255, sourc
 mav = m.mav
 state = {"named": {}, "servo": [0] * 17, "texts": []}
 override = {}          # channel -> pwm, re-sent continuously
+gui = {"cmd": None, "silent": False}   # CubeGUI's last command, repeated once a second as CubeGUI does
 results = []
 
 
 def pump(seconds):
     end = time.time() + seconds
     next_hb = 0
+    next_gui = time.time() + 1
     while time.time() < end:
         if time.time() >= next_hb:
             mav.heartbeat_send(6, 8, 0, 0, 0)
             send_override()
             next_hb = time.time() + 0.2
+        if time.time() >= next_gui:
+            if gui["cmd"] and not gui["silent"]:
+                mav.command_long_send(1, 1, 31010, 0, *gui["cmd"], 0, 0, 0, 0)
+            next_gui = time.time() + 1
         msg = m.recv_match(blocking=True, timeout=0.05)
         while msg:
             t = msg.get_type()
@@ -57,6 +63,8 @@ def set_param(name, value):
 
 
 def gui_command(mode, target=0.0, sas=0):
+    gui["cmd"] = (mode, target, sas)
+    gui["silent"] = False
     mav.command_long_send(1, 1, 31010, 0, mode, target, sas, 0, 0, 0, 0)
 
 
@@ -116,6 +124,22 @@ gui_command(2, -10.0)
 pump(3)
 check("closed loop: a nose-down target moves the elevator below trim", state["servo"][5] < 1500,
       f"out5={state['servo'][5]}")
+
+# ---- CubeGUI goes quiet in closed loop: the elevator is held still -----------------------
+state["texts"].clear()
+gui["silent"] = True
+pump(4.5)
+held = state["servo"][5]
+check("CubeGUI silent 3 s: CG_MODE 3 (held)", state["named"].get("CG_MODE") == 3, str(state["named"].get("CG_MODE")))
+check("held: says so", any("no word from CubeGUI" in t for t in state["texts"]), str(state["texts"][-3:]))
+set_servo(5, 1200)
+pump(2)
+check("held: the elevator stays put, and DO_SET_SERVO is ignored", state["servo"][5] == held and held != 1200,
+      f"held={held} now={state['servo'][5]}")
+gui_command(2, -10.0)
+pump(1.5)
+check("CubeGUI heard again: back to closed loop", state["named"].get("CG_MODE") == 2
+      and any("CubeGUI heard again" in t for t in state["texts"]), str(state["named"].get("CG_MODE")))
 
 # ---- back to GUI ----------------------------------------------------------------------
 gui_command(0)

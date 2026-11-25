@@ -15,8 +15,11 @@
 --     Another with RCn_OPTION = 301 switches SAS. Without them, CubeGUI chooses.
 --   * While this script drives an output, the Cube ignores CubeGUI's
 --     commands to that output, so only one thing drives a servo at a time.
+--   * If CubeGUI goes quiet for 3 seconds during the closed loop (the Wi-Fi
+--     drops, the laptop sleeps, MATLAB closes), the controller stops and the
+--     elevator is held where it is, until CubeGUI is heard again.
 --   * It tells CubeGUI what it's doing, 5 times a second, as named values:
---     CG_MODE (0 GUI, 1 RC, 2 closed loop), CG_SAS, CG_TGT, CG_RC, CG_ELEV.
+--     CG_MODE (0 GUI, 1 RC, 2 closed loop, 3 held), CG_SAS, CG_TGT, CG_RC, CG_ELEV.
 --
 -- Needs ArduPlane 4.5 or later (for receiving CubeGUI's commands).
 
@@ -27,11 +30,13 @@ local REPORT_EVERY = 10         -- report to CubeGUI every 10th run: 5 times a s
 local LOG_EVERY = 5             -- write to the Cube's own log every 5th run: 10 times a second
 local OVERRIDE_MS = 100         -- each output we drive is ours for this long, unless renewed
 local MAV_CMD_USER_1 = 31010    -- the command CubeGUI sends us
+local LINK_TIMEOUT_MS = 3000    -- CubeGUI repeats its command every second: 3 s silent means it's gone
 local COMMAND_LONG_ID = 76
 
 local MODE_GUI = 0
 local MODE_RC = 1
 local MODE_CLOSED_LOOP = 2
+local MODE_HELD = 3             -- closed loop, but CubeGUI has gone quiet: elevator held still
 
 -- ---- Parameters, editable in CubeGUI's Setup tab or Mission Planner --------
 
@@ -75,6 +80,7 @@ mavlink:block_command(MAV_CMD_USER_1)   -- ours: stop ArduPilot answering "unsup
 local guiMode = MODE_GUI    -- what CubeGUI last asked for: GUI or closed loop
 local guiTarget = 0         -- pitch target from CubeGUI, degrees
 local guiSas = false        -- SAS on or off, from CubeGUI
+local lastGuiMs = 0         -- when CubeGUI's last command arrived (millis)
 
 local function readCubeGuiCommands()
   local msg = mavlink:receive_chan()
@@ -87,6 +93,7 @@ local function readCubeGuiCommands()
       guiMode = (math.floor(p1 + 0.5) == MODE_CLOSED_LOOP) and MODE_CLOSED_LOOP or MODE_GUI
       guiTarget = math.max(-45, math.min(45, p2))   -- never ask for more than 45 degrees
       guiSas = p3 > 0.5
+      lastGuiMs = millis():toint()
     end
     msg = mavlink:receive_chan()
   end
@@ -181,6 +188,7 @@ local getPitch = ahrs.get_pitch_rad or ahrs.get_pitch
 local count = 0
 local mode = MODE_GUI
 local elevPwm = 0
+local heldPwm = nil          -- the elevator's last closed-loop PWM, held if CubeGUI goes quiet
 local switchSaysRc = false   -- the mode switch's last low or high position
 local switchSas = nil        -- the SAS switch's last low or high position (nil: no switch)
 
@@ -200,11 +208,21 @@ local function update()
     switchSaysRc = false
   end
   local newMode = switchSaysRc and MODE_RC or guiMode
+  -- Closed loop, but nothing from CubeGUI for a while: hold the elevator still
+  -- rather than carry on with nobody watching. A command from CubeGUI ends it.
+  if newMode == MODE_CLOSED_LOOP and millis():toint() - lastGuiMs > LINK_TIMEOUT_MS then
+    newMode = MODE_HELD
+  end
   if ENABLE:get() < 0.5 then
     newMode = MODE_GUI
   end
   if newMode ~= mode then
     integral = 0     -- start the controller afresh
+    if newMode == MODE_HELD then
+      gcs:send_text(4, "cubegui.lua: no word from CubeGUI for 3 s: elevator held")
+    elseif mode == MODE_HELD then
+      gcs:send_text(6, "cubegui.lua: CubeGUI heard again")
+    end
     mode = newMode
   end
 
@@ -236,11 +254,15 @@ local function update()
         pwm = drive(out, pwm)
         if out == elevOut then
           elevPwm = pwm
+          heldPwm = pwm   -- so a hold after RC keeps the elevator where the sticks left it
         end
       end
     end
   elseif mode == MODE_CLOSED_LOOP then
     elevPwm = drive(elevOut, pwmForOffset(elevOut, closedLoopOffset(guiTarget, pitch, rate, UPDATE_MS / 1000)))
+    heldPwm = elevPwm
+  elseif mode == MODE_HELD then
+    elevPwm = drive(elevOut, heldPwm or outputInfo(elevOut).trim)   -- (trim only if never driven)
   end
 
   if count % REPORT_EVERY == 0 then

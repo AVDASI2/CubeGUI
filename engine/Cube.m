@@ -61,7 +61,7 @@ classdef Cube < handle
 
     properties (Constant, Access = private)
         ScriptTimeout = 2   % seconds without CG_MODE before the script counts as absent
-        ModeNames = ["CubeGUI", "Transmitter (RC)", "Closed loop"]   % CG_MODE 0, 1, 2
+        ModeNames = ["CubeGUI", "Transmitter (RC)", "Closed loop", "Held: lost CubeGUI"]   % CG_MODE 0, 1, 2, 3
     end
 
     methods
@@ -255,18 +255,20 @@ classdef Cube < handle
 
         function m = mode(obj)
             % Who's in charge of the servos, as a struct:
-            %   name       "CubeGUI", "Transmitter (RC)" or "Closed loop"
-            %   code       0, 1 or 2 (CG_MODE), or NaN without the script
+            %   name       "CubeGUI", "Transmitter (RC)", "Closed loop" or
+            %              "Held: lost CubeGUI" (the script heard nothing from
+            %              CubeGUI for 3 s in closed loop, so holds the elevator still)
+            %   code       0, 1, 2 or 3 (CG_MODE), or NaN without the script
             %   script     true if the Cube's script is reporting
             %   rc         true if the Cube has a valid transmitter signal
             %   sas        true if stability augmentation is on
             %   target     the closed loop's pitch target (degrees), as the script reports it
             %   requested  what CubeGUI has asked for: "CubeGUI" or "Closed loop"
-            % Heard recently, and with a mode it knows (0, 1 or 2): a value
+            % Heard recently, and with a mode it knows (0 to 3): a value
             % can be missing just after the telemetry has been cleared.
             code = round(obj.latest("CG_MODE"));
             script = obj.Telemetry.secondsSinceNamed("CG_MODE") < obj.ScriptTimeout ...
-                && ismember(code, [0 1 2]);
+                && ismember(code, [0 1 2 3]);
             m = struct("name", "CubeGUI", "code", NaN, "script", script, "rc", false, ...
                 "sas", false, "target", NaN, "requested", obj.ModeNames(obj.Requested.mode + 1));
             if script
@@ -388,7 +390,7 @@ classdef Cube < handle
                 % Cube's script is still in closed loop (left there from a
                 % higher level), ask it to hand the elevator back, once a second.
                 m = obj.mode();
-                if m.script && m.code == 2 && (obj.LastRequestSend == 0 || toc(obj.LastRequestSend) >= 1)
+                if m.script && ismember(m.code, [2 3]) && (obj.LastRequestSend == 0 || toc(obj.LastRequestSend) >= 1)
                     obj.Requested.mode = 0;
                     obj.sendRequest();
                     obj.say("The Cube's script was in closed loop: asking it to hand the " + ...
@@ -477,6 +479,8 @@ classdef Cube < handle
             tel = obj.Telemetry;
             if m.code == 2 && output == valueOr(tel.param("CGUI_ELEV_OUT"), 5)
                 why = "the closed loop is driving it.";
+            elseif m.code == 3 && output == valueOr(tel.param("CGUI_ELEV_OUT"), 5)
+                why = "the Cube's script is holding it still (it lost CubeGUI).";
             elseif m.code == 1
                 defaults = [2 5; 4 6; 0 0; 0 0];   % the script's defaults: stick, output
                 for n = 1:4

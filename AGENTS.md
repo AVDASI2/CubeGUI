@@ -49,7 +49,7 @@ These protect the student's kit. Don't break them, even if asked; explain why in
 - **Levels** (0 Simulate, 1 Connect and log, 2 RC, 3 Closed loop) hide features until the unit reaches them. They don't lock anything.
 - **The Cube** is a Cube Orange+ running ArduPlane, set up as in the AVDASI 2 step-by-step guide (<https://avdasi2.github.io>). CubeGUI talks to it with MAVLink over UDP, through the Kahuna Wi-Fi bridge on the Cube's TELEM1 port (the laptop listens on port 14550; the Kahuna listens on 14555 at 192.168.4.1), or over a USB cable (a serial port, from MATLAB R2026b).
 - **`lua/cubegui.lua`** runs on the Cube from level 2, for RC control and the closed loop. `lua/README.md` explains it.
-- **Level 3 is a preview** until it's released (`released` in `engine/levels.m`; the window's title says "preview"). If a student is using it, tell them it's not yet supported by the course. Levels 0 to 2 are released.
+- **All four levels are released** (level 3 in November 2026). A level added later starts as a preview (`released` false in `engine/levels.m`; the window's title says "preview") until it's released: if a student uses one, tell them it's not yet supported by the course.
 - **How it works inside:** `docs/how-it-works.md`.
 
 ## Style

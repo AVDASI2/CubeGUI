@@ -4,7 +4,7 @@
 > **Not for flight.** This script has been tested on ArduPilot's simulator and is meant for a model held on a wind-tunnel or bench rig. It is not a flight controller and must not be used on anything that flies.
 
 > [!NOTE]
-> **Level 2 (RC) is released; level 3 (the closed loop) is a preview**, not supported until it's released. Setting up the transmitter itself (binding the receiver, the switches) is on the AVDASI 2 guide's [RC page](https://avdasi2.github.io/avionics/stepbystep/08-rc/).
+> **Levels 2 (RC) and 3 (the closed loop) are released.** Setting up the transmitter itself (binding the receiver, the switches) is on the AVDASI 2 guide's [RC page](https://avdasi2.github.io/avionics/stepbystep/08-rc/), and getting the closed loop working on the bench on its [Closed Loop page](https://avdasi2.github.io/avionics/stepbystep/09-closed-loop/).
 
 `cubegui.lua` runs on the Cube and decides who drives the servos:
 
@@ -72,13 +72,15 @@ Change `CGUI_KP`, `CGUI_KI` and `CGUI_KD` in the **Closed-loop gains** box on th
 
 The defaults are a guess at a safe start, not a tuned result: tune them on the rig, with the tunnel off first. CubeGUI's Simulated source runs the same controller with gains that suit the simulation, so you can try it at a desk.
 
+**If CubeGUI goes quiet.** CubeGUI repeats its request once a second. If the script hears nothing for **3 seconds** during the closed loop (the Wi-Fi drops, the laptop sleeps, MATLAB closes), it stops the controller and **holds the elevator where it is**, so losing CubeGUI never moves anything. `CG_MODE` becomes 3, the Who's in charge panel shows "Held: lost CubeGUI" in red, and the Messages tab says "no word from CubeGUI for 3 s: elevator held". When CubeGUI is heard again, the script does what it asks: if that's still the closed loop, the controller starts afresh. The transmitter's mode switch still takes over while the elevator is held.
+
 ## What it sends back
 
 Five times a second, as values CubeGUI can plot and log (`logging.extraSignals`):
 
 | Name | Meaning |
 |---|---|
-| `CG_MODE` | 0 CubeGUI, 1 RC, 2 closed loop |
+| `CG_MODE` | 0 CubeGUI, 1 RC, 2 closed loop, 3 held (CubeGUI went quiet during the closed loop) |
 | `CG_SAS` | 1 if SAS is on |
 | `CG_TGT` | the pitch target, degrees |
 | `CG_RC` | 1 if the transmitter's signal is valid |
@@ -96,4 +98,4 @@ It also writes a `CGUI` entry into the Cube's own log 10 times a second (mode, S
 
 ## Tested
 
-On ArduPilot's simulator (SITL), built from ArduPilot's own source on 2026-11-01, for both **ArduPlane 4.6.3** and the 4.8 development version. Tested: the three modes, both switches, CubeGUI's commands being ignored while the script drives, `SERVOn_MIN`/`MAX` and `REVERSED` being honoured, `CGUI_ENABLE`, and losing the RC signal with `THR_FAILSAFE = 2`; also CubeGUI end to end. Copying the script from CubeGUI was tested on SITL on 2026-11-03. On a real Cube (November 2026): RC with both switches, copying the script over the Wi-Fi and over USB, and losing the signal (with the receiver's failsafe on "No pulses", turning the transmitter off gave CubeGUI the servos back). Robin has also run the closed loop on a kit. `tools/sitl/` has the tests.
+On ArduPilot's simulator (SITL), built from ArduPilot's own source on 2026-11-01, for both **ArduPlane 4.6.3** and the 4.8 development version. Tested: the three modes, both switches, the hold when CubeGUI goes quiet, CubeGUI's commands being ignored while the script drives, `SERVOn_MIN`/`MAX` and `REVERSED` being honoured, `CGUI_ENABLE`, and losing the RC signal with `THR_FAILSAFE = 2`; also CubeGUI end to end. Copying the script from CubeGUI was tested on SITL on 2026-11-03. On a real Cube (November 2026): RC with both switches, copying the script over the Wi-Fi and over USB, and losing the signal (with the receiver's failsafe on "No pulses", turning the transmitter off gave CubeGUI the servos back). Robin has also run the closed loop on a kit. `tools/sitl/` has the tests.

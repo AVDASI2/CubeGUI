@@ -117,6 +117,14 @@ verifyFalse(tc, cube.servo("Elevator").ready)
 verifyFalse(tc, cube.servo("Rudder").ready)
 verifyTrue(tc, cube.servo("Gear").ready)
 verifyTrue(tc, contains(cube.servo("Rudder").why, "transmitter"))
+
+tel.addNamedValue("CG_MODE", 3, 3);    % held: the script lost CubeGUI in closed loop
+m = cube.mode();
+verifyTrue(tc, m.script)
+verifyEqual(tc, m.name, "Held: lost CubeGUI")
+verifyFalse(tc, cube.servo("Elevator").ready)
+verifyTrue(tc, contains(cube.servo("Elevator").why, "holding it still"))
+verifyTrue(tc, cube.servo("Rudder").ready, "Only the elevator is held.")
 end
 
 function testClosedLoopHandedBackBelowLevel2(tc)

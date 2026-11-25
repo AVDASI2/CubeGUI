@@ -182,7 +182,7 @@ The shipped panels: `plotPanel` (any signal), `servoPanel` (a slider for one ser
 
 The tunnel profiles (`config/fuselage.json` and the wings) are settings files at level 3, not a level of their own.
 
-Each level also has `released`. Level 3 is false for now: it works, but isn't released to students (level 2 was released in November 2026). At such a level the window's title ends "(preview: not released yet)", the status line says so in red when the window opens, and the demo drop-down marks them "(preview)". Releasing a level means setting it to true.
+Each level also has `released`. All four are true now (levels 2 and 3 were released in November 2026). A level that's false (a new one, in the code but not yet released to students) gets "(preview: not released yet)" at the end of the window's title, a red note in the status line when the window opens, and "(preview)" in the demo drop-down. Releasing a level means setting it to true.
 
 The window's title shows the level. `CubeGUI(Demo=true)` adds a drop-down that closes the window and opens it again at the chosen level (`changeLevel`). Levels hide features; they don't lock them.
 
@@ -195,18 +195,19 @@ From level 2, a Lua script on the Cube, `lua/cubegui.lua`, can drive servos inst
 - **0, CubeGUI:** it does nothing.
 - **1, RC:** it copies sticks onto outputs.
 - **2, closed loop:** a PID moves the elevator to hold a pitch target.
+- **3, held:** the closed loop was asked for, but nothing has come from CubeGUI for 3 s (`LINK_TIMEOUT_MS`; CubeGUI repeats its request every second). The controller stops and the elevator stays at its last PWM (`heldPwm`, also updated in RC mode, so a hold after RC keeps the sticks' position) until a command arrives. Then the script follows it, with the I term reset.
 
 A transmitter switch decides if there is one: the channel with `RCn_OPTION = 300` (`CGUI_MODE_FUNC`), low RC, high CubeGUI, middle no change. Otherwise CubeGUI does. SAS works the same way with 301. It drives an output with `SRV_Channels:set_output_pwm_chan_timeout`, renewed every run and lapsing after 0.1 s. While that override is active, ArduPilot ignores `DO_SET_SERVO` for that output (`SRV_Channel.cpp`), so only one thing drives a servo at a time, and if the script stops, its hold lapses within 0.1 s. It keeps outputs within `SERVOn_MIN/MAX` and honours `SERVOn_REVERSED`. Five times a second it sends `CG_MODE`, `CG_SAS`, `CG_TGT`, `CG_RC` and `CG_ELEV` as named values, and 10 times a second it writes a `CGUI` entry to the Cube's own log.
 
 **CubeGUI to the script.** `Cube.requestMode`, `setPitchTarget` and `setSas` store a request; `Cube.sendRequest` sends it as a `COMMAND_LONG` with `MAV_CMD_USER_1` (31010): param1 mode, param2 target, param3 SAS. `DataSource.sendScriptCommand` does the sending, so the Simulated source can answer too. The request is resent once a second (`tick`), so a lost message is soon made good, and target changes from a slider are sent at most 10 times a second. The script decodes the message with `string.unpack`, so no MAVLink module files are needed on the SD card.
 
-**Who's in charge.** `Cube.mode()` reads `CG_MODE` and the rest. The script counts as absent if `CG_MODE` hasn't arrived for 2 s (`Telemetry.secondsSinceNamed`). `Cube.usable(k)` combines a servo's limits with `scriptDrives(output)`: in closed loop the elevator output (`CGUI_ELEV_OUT`), and in RC mode the outputs in `CGUI_Mn_OUT`. `cube.servo(name).ready` is false while the script drives it, with the reason in `why`, so `servoPanel` greys out with an explanation. When the script hands a servo back, `followScript` moves its target to where the servo actually is, so the slider catches up rather than the servo jumping.
+**Who's in charge.** `Cube.mode()` reads `CG_MODE` and the rest. The script counts as absent if `CG_MODE` hasn't arrived for 2 s (`Telemetry.secondsSinceNamed`). `Cube.usable(k)` combines a servo's limits with `scriptDrives(output)`: in closed loop or held the elevator output (`CGUI_ELEV_OUT`), and in RC mode the outputs in `CGUI_Mn_OUT`. `cube.servo(name).ready` is false while the script drives it, with the reason in `why`, so `servoPanel` greys out with an explanation. When the script hands a servo back, `followScript` moves its target to where the servo actually is, so the slider catches up rather than the servo jumping.
 
 **The transmitter.** `RC_CHANNELS` is read 5 times a second into `Telemetry.Rc`. Its channels are signals `rc1` to `rc18`, shown by `rcPanel`. From level 2 the Setup tab wants `THR_FAILSAFE = 2`: with 0, ArduPlane never declares RC lost, so the script would keep using the last stick positions.
 
 **The Simulated source** acts as if the script were installed, once CubeGUI has sent it a command (which `Cube.attach` does from level 2). In `runScript` it runs the same PID with its own `CGUI_` parameters (gains tuned for the simulation), ignores CubeGUI's commands to the elevator during closed loop, and reports the same named values. It has no transmitter, so there's no RC mode in the simulation.
 
-**Below level 2** the window has no mode controls, so `Cube.tick` watches for the script reporting closed loop and, if it does, asks for CubeGUI mode once a second. That stops a Cube left in closed loop by a higher level keeping the elevator from a level 1 window.
+**Below level 2** the window has no mode controls, so `Cube.tick` watches for the script reporting closed loop (or held) and, if it does, asks for CubeGUI mode once a second. That stops a Cube left in closed loop by a higher level keeping the elevator from a level 1 window.
 
 **The gains box** (level 3, built by `CubeGuiApp.buildGainsPanel`) shows `CGUI_KP`, `CGUI_KI` and `CGUI_KD` as the Cube reports them. A box someone has typed in stops following the Cube until the Cube has that value. **Apply...** lists the changed gains and writes them through the same `confirmed`/`writeParams` path as the Setup tab. It's in the engine rather than a panel because panels can't write parameters.
 

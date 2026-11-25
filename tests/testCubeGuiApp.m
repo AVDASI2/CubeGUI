@@ -359,12 +359,13 @@ row = rows(string(rows{:, 2}) == "AVDASI2_RC_FUNC", :);
 verifyEqual(tc, string(row{1, 5}), "Remove avdasi2.lua")
 end
 
-function testUnreleasedLevelsSayPreview(tc)
-% Levels in the code but not yet released say so, in the title and the status line.
+function testReleasedLevelsDontSayPreview(tc)
+% All four levels are released, so none says "preview" in the title or the status line.
+verifyTrue(tc, all([levels().released]))
 app = openWith(tc, @(c) setfield(c, "level", 3));
-verifyEqual(tc, string(app.Figure.Name), "CubeGUI, level 3 of 3: Closed loop (preview: not released yet)")
+verifyEqual(tc, string(app.Figure.Name), "CubeGUI, level 3 of 3: Closed loop")
 labels = string({findall(app.Figure, "Type", "uilabel").Text});
-verifyTrue(tc, any(startsWith(labels, "Level 3 is a preview")))
+verifyFalse(tc, any(contains(labels, "preview")))
 app = openWith(tc, @(c) setfield(c, "level", 2));
 verifyEqual(tc, string(app.Figure.Name), "CubeGUI, level 2 of 3: RC")
 end

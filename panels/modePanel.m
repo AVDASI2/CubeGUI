@@ -73,7 +73,8 @@ if ~cube.isConnected()
 end
 
 % Grey: no script. Green: CubeGUI. Blue: transmitter. Amber: closed loop.
-colours = [0 0.75 0; 0 0.4 1; 1 0.7 0];
+% Red: held, because the script lost CubeGUI (seen when CubeGUI comes back).
+colours = [0 0.75 0; 0 0.4 1; 1 0.7 0; 0.85 0 0];
 if ~m.script
     lamp.Color = [0.6 0.6 0.6];
     setIfDifferent(who, "Text", "CubeGUI (no script heard)");
